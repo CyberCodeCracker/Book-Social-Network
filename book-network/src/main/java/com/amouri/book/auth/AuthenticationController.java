@@ -1,6 +1,7 @@
 package com.amouri.book.auth;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,13 +24,27 @@ public class AuthenticationController {
             // Binds the method parameter to the body of the HTTP request and triggers validation
             // on the RegistrationRequest object based on constraints defined within the class.
             @RequestBody @Valid RegistrationRequest request
-    ) {
+    ) throws MessagingException {
         // Calls the register method of the AuthenticatinoService class, passing in the request object.
         // This is where the actual registration logic is handled.
         service.register(request);
         // Constrcuts and returns a ResponseEntity with a status of 202 Accepted.
         // The build() method creates the response without a body
         return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate (
+            @RequestBody @Valid AuthenticationResquest request
+    ) {
+        return ResponseEntity.ok(service.authenticate(request));
+    }
+
+    @GetMapping("/activate-account")
+    public void confirm(
+            @RequestParam String token
+    ) throws MessagingException {
+        service.activateAccount(token);
     }
 
 }

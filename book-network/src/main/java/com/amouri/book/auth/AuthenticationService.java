@@ -3,6 +3,7 @@ package com.amouri.book.auth;
 import com.amouri.book.email.EmailService;
 import com.amouri.book.email.EmailTemplateName;
 import com.amouri.book.role.RoleRepository;
+import com.amouri.book.security.JwtService;
 import com.amouri.book.user.Token;
 import com.amouri.book.user.TokenRepository;
 import com.amouri.book.user.User;
@@ -10,11 +11,15 @@ import com.amouri.book.user.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -26,8 +31,11 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
     @Value("${application.mailing.frontend.activation-url}")
     private String activationUrl;
+
     public void register(RegistrationRequest request) throws MessagingException {
          var userRole = roleRepository.findByName("USER")
                  // todo - better exception handling
@@ -80,5 +88,50 @@ public class AuthenticationService {
             codeBuilder.append(characters.charAt(randomIndex));
         }
         return codeBuilder.toString();
+    }
+
+    public AuthenticationResponse authenticate(AuthenticationResquest request) {
+        // Authenticate the user using the authentication manager
+        var auth = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                    request.getEmail(),     // Get the email from the request
+                    request.getPassword()   // Get the password from the request
+            )
+        );
+        // Create a map to store custom claims for the JWT
+        var claims = new HashMap<String, Object>();
+        // Retrieve the authenticated user details
+        var user = ((User)auth.getPrincipal());
+        // Add the user's full name to the claims
+        claims.put("fullName", user.getFullName());
+        // Generate a JWT token using the claims and the user details
+        var jwtToken = jwtService.generateToken(claims, user);
+        // Build the AuthenticationResponse with the generated token
+        return AuthenticationResponse.builder()
+                .token(jwtToken).build();
+    }
+    // @Transactional
+    public void activateAccount(String token) throws MessagingException {
+        // Retrieve the token from the repository
+        Token savedToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid token"));
+        // Check if the token has expired
+        if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())) {
+            // If expired, send a new validation email and throw an exception
+            sendValidationEmail(savedToken.getUser());
+            throw new RuntimeException("Activation token has expires. A new token has been sent to the same email address");
+        }
+
+        // Retrieve the user associated with the token
+        var user = userRepository.findById(savedToken.getUser().getId())
+                .orElseThrow(() -> new RuntimeException("User not found."));
+
+        // Enable the user account
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        // Update the token's validation timestamp
+        savedToken.setValidatedAt(LocalDateTime.now());
+        tokenRepository.save(savedToken);
     }
 }
