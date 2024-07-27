@@ -1,5 +1,7 @@
 package com.amouri.book.book;
 
+import com.amouri.book.history.BookTransactionHistory;
+
 public class BookMapper {
 
     public Book toBook(BookRequest request) {
@@ -25,6 +27,18 @@ public class BookMapper {
                 .shareable(book.isShareable())
                 .owner(book.getOwner().getFullName())
                 // .cover()
+                .build();
+    }
+
+    public BurrowedBookResponse toBurrowedBookResponse(BookTransactionHistory bookTransactionHistory) {
+        return BurrowedBookResponse.builder()
+                .title(bookTransactionHistory.getBook().getTitle())
+                .id(bookTransactionHistory.getBook().getId())
+                .authorName(bookTransactionHistory.getBook().getAuthorName())
+                .isbn(bookTransactionHistory.getBook().getIsbn())
+                .rate(bookTransactionHistory.getBook().getRate())
+                .returned(bookTransactionHistory.isReturned())
+                .returnedApproved(bookTransactionHistory.isReturnApproved())
                 .build();
     }
 }

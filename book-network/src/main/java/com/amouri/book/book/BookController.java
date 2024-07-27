@@ -50,4 +50,13 @@ public class BookController {
     ) {
         return ResponseEntity.ok(service.findAllBooksByOwner(page, size, connectedUser));
     }
+
+    @GetMapping("/burrowed")
+    public ResponseEntity<PageResponse<BurrowedBookResponse>> findAllBurrowedBooks(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size,
+            Authentication connectedUser
+    ) {
+        return ResponseEntity.ok(service.findAllBurrowedBooks(page, size, connectedUser));
+    }
 }

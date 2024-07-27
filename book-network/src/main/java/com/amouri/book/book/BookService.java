@@ -1,6 +1,8 @@
 package com.amouri.book.book;
 
 import com.amouri.book.common.PageResponse;
+import com.amouri.book.history.BookTransactionHistory;
+import com.amouri.book.history.BookTransactionHistoryRepository;
 import com.amouri.book.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class BookService {
 
     private final bookRepository bookRepository;
     private final BookMapper bookMapper;
+    private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
     public Integer save(BookRequest request, Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
         Book book = bookMapper.toBook(request);
@@ -65,6 +68,24 @@ public class BookService {
                 books.getTotalPages(),
                 books.isFirst(),
                 books.isLast()
+        );
+    }
+
+    public PageResponse<BurrowedBookResponse> findAllBurrowedBooks(int page, int size, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<BookTransactionHistory> allBurrowedBooks = bookTransactionHistoryRepository.findAllBurrowedBooks(pageable, user.getId());
+        List<BurrowedBookResponse> booksResponse = allBurrowedBooks.stream()
+                .map(bookMapper::toBurrowedBookResponse)
+                .toList();
+        return new PageResponse<>(
+                booksResponse ,
+                allBurrowedBooks.getNumber(),
+                allBurrowedBooks.getSize(),
+                allBurrowedBooks.getNumberOfElements(),
+                allBurrowedBooks.getTotalPages(),
+                allBurrowedBooks.isFirst(),
+                allBurrowedBooks.isLast()
         );
     }
 }
