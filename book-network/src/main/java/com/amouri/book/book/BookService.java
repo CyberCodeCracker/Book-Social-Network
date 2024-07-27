@@ -1,6 +1,7 @@
 package com.amouri.book.book;
 
 import com.amouri.book.common.PageResponse;
+import com.amouri.book.exception.OperationNotPermittedException;
 import com.amouri.book.history.BookTransactionHistory;
 import com.amouri.book.history.BookTransactionHistoryRepository;
 import com.amouri.book.user.User;
@@ -14,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -87,5 +89,35 @@ public class BookService {
                 allBurrowedBooks.isFirst(),
                 allBurrowedBooks.isLast()
         );
+    }
+
+    public PageResponse<BurrowedBookResponse> findAllReturnedBooks(int page, int size, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<BookTransactionHistory> allBurrowedBooks = bookTransactionHistoryRepository.findAllReturnedBooks(pageable, user.getId());
+        List<BurrowedBookResponse> booksResponse = allBurrowedBooks.stream()
+                .map(bookMapper::toBurrowedBookResponse)
+                .toList();
+        return new PageResponse<>(
+                booksResponse ,
+                allBurrowedBooks.getNumber(),
+                allBurrowedBooks.getSize(),
+                allBurrowedBooks.getNumberOfElements(),
+                allBurrowedBooks.getTotalPages(),
+                allBurrowedBooks.isFirst(),
+                allBurrowedBooks.isLast()
+        );
+    }
+
+    public Integer updateBookShareableStatus(Integer bookId, Authentication connectedUser) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with the ID:: " + bookId));
+        User user = ((User) connectedUser.getPrincipal());
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("You don't have permission to update book shareable status.");
+        }
+        book.setShareable(!book.isShareable());
+        bookRepository.save(book);
+        return bookId;
     }
 }
