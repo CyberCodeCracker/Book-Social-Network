@@ -30,8 +30,8 @@ public class BookMapper {
                 .build();
     }
 
-    public BurrowedBookResponse toBurrowedBookResponse(BookTransactionHistory bookTransactionHistory) {
-        return BurrowedBookResponse.builder()
+    public BorrowedBookResponse toBurrowedBookResponse(BookTransactionHistory bookTransactionHistory) {
+        return BorrowedBookResponse.builder()
                 .title(bookTransactionHistory.getBook().getTitle())
                 .id(bookTransactionHistory.getBook().getId())
                 .authorName(bookTransactionHistory.getBook().getAuthorName())

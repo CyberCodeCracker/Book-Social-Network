@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BurrowedBookResponse {
+public class BorrowedBookResponse {
 
     private Integer id;
     private String title;
