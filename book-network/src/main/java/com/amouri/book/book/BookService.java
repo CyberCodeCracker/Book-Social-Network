@@ -120,4 +120,39 @@ public class BookService {
         bookRepository.save(book);
         return bookId;
     }
+
+    public Integer updateBookArchivedStatus(Integer bookId, Authentication connectedUser) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with the ID:: " + bookId));
+        User user = ((User) connectedUser.getPrincipal());
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("You don't have permission to update book archived status.");
+        }
+        book.setArchived(!book.isArchived());
+        bookRepository.save(book);
+        return bookId;
+    }
+
+    public Integer burrowBook(Integer bookId, Authentication connectedUser) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book with ID:: " + bookId + " not found"));
+        if(book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException(("Requested book cannot be borrowed since it is archived or not shareable"));
+        }
+        User user = ((User) connectedUser.getPrincipal());
+        if (Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("You cannot borrow your own book");
+        }
+        final boolean isAlreadyBurrowed = bookTransactionHistoryRepository.isAlreadyBurrowedByUser(bookId, user.getId());
+        if (isAlreadyBurrowed) {
+            throw new OperationNotPermittedException("The desired book is already borrowed");
+        }
+        BookTransactionHistory bookTransactionHistory = BookTransactionHistory.builder()
+                .user(user)
+                .book(book)
+                .returned(false)
+                .returnApproved(false)
+                .build();
+        return bookTransactionHistoryRepository.save(bookTransactionHistory).getId();
+    }
 }
