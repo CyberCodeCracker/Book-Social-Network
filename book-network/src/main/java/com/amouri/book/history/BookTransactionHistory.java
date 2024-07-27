@@ -29,4 +29,5 @@ public class BookTransactionHistory extends BaseEntity {
 
     private boolean returned;
     private boolean returnApproved;
+
 }
