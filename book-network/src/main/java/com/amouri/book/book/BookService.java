@@ -2,6 +2,7 @@ package com.amouri.book.book;
 
 import com.amouri.book.common.PageResponse;
 import com.amouri.book.exception.OperationNotPermittedException;
+import com.amouri.book.file.FileStorageService;
 import com.amouri.book.history.BookTransactionHistory;
 import com.amouri.book.history.BookTransactionHistoryRepository;
 import com.amouri.book.user.User;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +26,7 @@ public class BookService {
     private final bookRepository bookRepository;
     private final BookMapper bookMapper;
     private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
+    private final FileStorageService fileStorageService;
     public Integer save(BookRequest request, Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
         Book book = bookMapper.toBook(request);
@@ -133,7 +136,7 @@ public class BookService {
         return bookId;
     }
 
-    public Integer burrowBook(Integer bookId, Authentication connectedUser) {
+    public Integer borrowBook(Integer bookId, Authentication connectedUser) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("Book with ID:: " + bookId + " not found"));
         if(book.isArchived() || !book.isShareable()) {
@@ -186,5 +189,14 @@ public class BookService {
                 .orElseThrow(() -> new OperationNotPermittedException("You did not borrow this book"));
         bookTransactionHistory.setReturnApproved(true);
         return bookTransactionHistoryRepository.save(bookTransactionHistory).getId();
+    }
+
+    public void uploadBookCoverPicture(MultipartFile file, Authentication connectedUser, Integer bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("Book with ID:: " + bookId + " not found"));
+        User user = ((User) connectedUser.getPrincipal());
+        var bookCover = fileStorageService.saveFile(file, user.getId());
+        book.setBookCover(bookCover);
+        bookRepository.save(book);
     }
 }
