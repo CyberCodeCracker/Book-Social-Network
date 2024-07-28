@@ -1,5 +1,6 @@
 package com.amouri.book.book;
 
+import com.amouri.book.file.FileUtils;
 import com.amouri.book.history.BookTransactionHistory;
 
 public class BookMapper {
@@ -26,7 +27,7 @@ public class BookMapper {
                 .archived(book.isArchived())
                 .shareable(book.isShareable())
                 .owner(book.getOwner().getFullName())
-                // .cover()
+                .cover(FileUtils.readFileFromLocation(book.getBookCover()))
                 .build();
     }
 

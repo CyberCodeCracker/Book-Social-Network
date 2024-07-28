@@ -23,7 +23,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class BookService {
 
-    private final bookRepository bookRepository;
+    private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
     private final FileStorageService fileStorageService;
