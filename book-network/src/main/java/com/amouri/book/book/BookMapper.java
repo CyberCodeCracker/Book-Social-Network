@@ -2,7 +2,9 @@ package com.amouri.book.book;
 
 import com.amouri.book.file.FileUtils;
 import com.amouri.book.history.BookTransactionHistory;
+import org.springframework.stereotype.Service;
 
+@Service
 public class BookMapper {
 
     public Book toBook(BookRequest request) {
