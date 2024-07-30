@@ -77,8 +77,8 @@ public class GlobalExceptionHandler {
         Set<String> errors = new HashSet<>();
         exp.getBindingResult().getAllErrors()
                 .forEach(error -> {
-                    var errorMessage = error.getDefaultMessage();
-                    errors.add(errorMessage);
+                    var errorMsg = error.getDefaultMessage();
+                    errors.add(errorMsg);
                 });
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
