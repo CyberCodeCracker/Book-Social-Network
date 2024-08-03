@@ -30,7 +30,7 @@ export class BookCardComponent {
   }
 
   get manage(): boolean {
-    return this.manage;
+    return this._manage;
   }
 
   @Input()
