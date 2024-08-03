@@ -32,7 +32,7 @@ public class BookController {
     public ResponseEntity<BookResponse> findBookById(
           @PathVariable("book-id") Integer bookId
     ) {
-        return ResponseEntity.ok(service.findById(bookId));
+        return ResponseEntity.ok(service.findBookById(bookId));
     }
 
     @GetMapping
@@ -59,7 +59,7 @@ public class BookController {
             @RequestParam(name = "size", defaultValue = "10", required = false) int size,
             Authentication connectedUser
     ) {
-        return ResponseEntity.ok(service.findAllBurrowedBooks(page, size, connectedUser));
+        return ResponseEntity.ok(service.findAllBorrowedBooks(page, size, connectedUser));
     }
 
     @GetMapping("/returned")

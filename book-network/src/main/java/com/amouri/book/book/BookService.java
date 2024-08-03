@@ -34,7 +34,7 @@ public class BookService {
         return bookRepository.save(book).getId();
     }
 
-    public BookResponse findById(Integer bookId) {
+    public BookResponse findBookById(Integer bookId) {
         return bookRepository.findById(bookId)
                 .map(bookMapper::toBookResponse)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with the ID:: " + bookId));
@@ -76,7 +76,7 @@ public class BookService {
         );
     }
 
-    public PageResponse<BorrowedBookResponse> findAllBurrowedBooks(int page, int size, Authentication connectedUser) {
+    public PageResponse<BorrowedBookResponse> findAllBorrowedBooks(int page, int size, Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<BookTransactionHistory> allBurrowedBooks = bookTransactionHistoryRepository.findAllBurrowedBooks(pageable, user.getId());

@@ -341,7 +341,7 @@ export class BookService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  findAllBurrowedBooks(params?: FindAllBurrowedBooks$Params, context?: HttpContext): Observable<PageResponseBorrowedBookResponse> {
+  findAllBorrowedBooks(params?: FindAllBurrowedBooks$Params, context?: HttpContext): Observable<PageResponseBorrowedBookResponse> {
     return this.findAllBurrowedBooks$Response(params, context).pipe(
       map((r: StrictHttpResponse<PageResponseBorrowedBookResponse>): PageResponseBorrowedBookResponse => r.body)
     );

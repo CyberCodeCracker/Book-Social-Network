@@ -28,6 +28,7 @@ export class ManageBookComponent implements OnInit {
         'book-id': bookId
       }).subscribe({
         next: (book: BookResponse) => {
+          console.log(book);
           this.bookRequest = {
             id: book.id,
             title: book.title as string,
@@ -35,7 +36,8 @@ export class ManageBookComponent implements OnInit {
             synopsis: book.synopsis as string,
             isbn: book.isbn as string,
             shareable: book.shareable
-          }
+          };
+          console.log(this.bookRequest.isbn);
           if (book.cover) {
             this.selectedPicture = 'data:image/jpg;base64,' + book.cover; 
           }
