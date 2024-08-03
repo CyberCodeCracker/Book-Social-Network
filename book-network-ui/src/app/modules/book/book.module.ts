@@ -11,6 +11,7 @@ import { MyBooksComponent } from './pages/my-books/my-books.component';
 import { ManageBookComponent } from './pages/manage-book/manage-book.component';
 import { FormsModule } from '@angular/forms';
 import { BorrowedBooksListComponent } from './pages/borrowed-books-list/borrowed-books-list.component';
+import { ReturnedBooksComponent } from './pages/returned-books/returned-books.component';
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import { BorrowedBooksListComponent } from './pages/borrowed-books-list/borrowed
     RatingComponent,
     MyBooksComponent,
     ManageBookComponent,
-    BorrowedBooksListComponent
+    BorrowedBooksListComponent,
+    ReturnedBooksComponent
   ],
   imports: [
     CommonModule,
