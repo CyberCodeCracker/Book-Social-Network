@@ -17,6 +17,7 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.springframework.http.HttpHeaders.*;
 
@@ -61,7 +62,7 @@ public class BeansConfig {
         config.setAllowCredentials(true);
 
         // Specify the allowed origin for CORS requests (e.g., the frontend application running on localhost:4200).
-        config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+        config.setAllowedOrigins(List.of("http://localhost:4200", "https://localhost:8080"));
 
         // Define the headers that are allowed to be included in CORS requests.
         config.setAllowedHeaders(Arrays.asList(

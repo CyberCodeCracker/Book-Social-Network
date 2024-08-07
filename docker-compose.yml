@@ -1,12 +1,14 @@
+version: '3.8'
+
 services:
   postgres:
     container_name: postgres-sql-bsn
     image: postgres
     environment:
-      POSTGRES_USER: username
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
       PGDATA: /var/lib/postgresql/data
-      POSTSGRES_DB: book_social_network
+      POSTGRES_DB: book_social_network
     volumes:
       - postgres:/data/postgres
     ports:
@@ -14,12 +16,39 @@ services:
     networks:
       - spring-demo
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U username"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   mail-dev:
     container_name: mail-dev-bsn
     image: maildev/maildev
     ports:
       - 1080:1080
       - 1025:1025
+
+  bsn-api:
+    container_name: bsn-api
+    image: bsn/bsn:1.0.3
+    ports:
+      - 8088:8088
+    networks:
+      - spring-demo
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  bsn-ui:
+    container_name: bsn-ui
+    image: bsn/bsn-ui:1.0.0
+    ports:
+      - 8080:80
+    networks:
+      - spring-demo
+    depends_on:
+      - bsn-api
 
 networks:
   spring-demo:
