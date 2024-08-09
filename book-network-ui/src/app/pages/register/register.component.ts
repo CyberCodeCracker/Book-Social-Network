@@ -1,4 +1,3 @@
-import { Token } from '@angular/compiler';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { RegistrationRequest } from 'src/app/services/models';
@@ -27,7 +26,7 @@ export class RegisterComponent {
       body: this.registrationRequest 
     }).subscribe({
       next: () => {
-        this.router.navigate(['navigate-account']);
+        this.router.navigate(['activate-account']);
       },
       error: (err) => {
         this.errorMsg = err.error.validationErrors;
