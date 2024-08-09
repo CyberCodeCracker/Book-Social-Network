@@ -28,14 +28,13 @@ spring:
         starttls:
           enabled: true
     protocol: smtp
-application:
   security:
-    jwt:
-      secret-key: r5A2aA4gL+M2U7sF6NnXo0qIv0zV5p0gH+KkP8w0JmQ=
-      expiration: 86400000
-  mailing:
-    frontend:
-      activation-url: http://localhost:4200/activate-account
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "http://localhost:9090/realms/book-social-network"
+
+application:
   file:
     upload:
       photos-output-path: ./uploads

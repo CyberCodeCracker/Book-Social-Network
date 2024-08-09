@@ -1,28 +1,34 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { KeycloakService } from 'src/app/services/keycloak/keycloak.service';
+/* Old imports needed with JWT implementation
 import { AuthenticationResponse, AuthenticationResquest } from 'src/app/services/models';
 import { AuthenticationService } from 'src/app/services/services';
 import { TokenService } from 'src/app/services/token/token.service';
+import { Router } from '@angular/router';
+*/
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
-  authRequest: AuthenticationResquest = {email: '', password: ''};
-  errorMsg: Array<string> = [];
+  // authRequest: AuthenticationResquest = {email: '', password: ''};
+  // errorMsg: Array<string> = [];
 
   constructor(
-    private router: Router,
-    private authService: AuthenticationService,
-    private tokenService: TokenService
+    private keycloakService: KeycloakService
   ) { 
 
   }
 
-  login() {
+  async ngOnInit(): Promise<void> {
+      await this.keycloakService.init();
+      await this.keycloakService.login();
+  }
+
+  /*login() {
     this.errorMsg = [];
     this.authService.authenticate({
       body: this.authRequest
@@ -44,5 +50,5 @@ export class LoginComponent {
 
   register() {
     this.router.navigate(['register']);
-  }
+  } */
 }

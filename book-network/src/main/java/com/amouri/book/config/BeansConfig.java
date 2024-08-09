@@ -25,7 +25,7 @@ import static org.springframework.http.HttpHeaders.*;
 @RequiredArgsConstructor
 public class BeansConfig {
 
-    private final UserDetailsService userDetailsService;
+    /* private final UserDetailsService userDetailsService;
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -47,7 +47,7 @@ public class BeansConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
+    } */
 
     // Marks this method as a Spring bean that will be managed by the Spring container.
     @Bean
